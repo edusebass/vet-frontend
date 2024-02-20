@@ -7,11 +7,35 @@ import { createContext, useEffect, useState } from "react"
 // This context will be used to share authentication-related information between components.
 const AuthContext = createContext()
 
+
+
 // Auth Provider Component:
 // The AuthProvider component is a functional component that serves as the provider for the AuthContext. 
 // It receives children as a prop, which represents the child components that will be wrapped by this provider.
 const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState({})
+
+        const actualizarPerfil = async(datos) => {
+        const token = localStorage.getItem('token')
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/veterinario/${datos.id}`
+            const options = {
+                headers: {
+                    method: 'PUT',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const respuesta = await axios.put(url, datos, options)
+            perfil(token)
+            return {respuesta:respuesta.data.msg,tipo:true}
+        } catch (error) {
+            // return {respuesta:error.response?.data.msg,tipo:false}
+            console.log(error)
+        }
+    }
+
+    
 
     const perfil = async(token) => {
         try {
@@ -44,7 +68,8 @@ const AuthProvider = ({ children }) => {
         <AuthContext.Provider value={
             {
                 auth,
-                setAuth              
+                setAuth,
+                actualizarPerfil              
             }
         }>
             {children}
@@ -54,4 +79,5 @@ const AuthProvider = ({ children }) => {
 export {
     AuthProvider
 }
+
 export default AuthContext 
